@@ -1,7 +1,10 @@
+from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError
 
 from . import serializers
+from .pagination import ReviewCommentPagination
 from .permissions import IsAuthorOrReadOnly, IsStaff
 from review.models import Title
 
@@ -9,6 +12,7 @@ from review.models import Title
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ReviewSerializer
     permission_classes = [IsAuthorOrReadOnly | IsStaff]
+    pagination_class = ReviewCommentPagination
 
     def get_queryset(self):
         """Достаем отзывы произведения"""
@@ -26,6 +30,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
     permission_classes = [IsAuthorOrReadOnly | IsStaff]
+    pagination_class = ReviewCommentPagination
 
     def get_queryset(self):
         """Достаем комментарии к отзыву произведения"""
@@ -44,4 +49,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         )
 
         title_data = {"review": review, "author": self.request.user}
-        serializer.save(**title_data)
+        try:
+            serializer.save(**title_data)
+        except IntegrityError:
+            raise ValidationError(
+                "The fields title, following must make a unique set."
+            )

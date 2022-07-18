@@ -25,6 +25,7 @@ class Review(models.Model):
                 name="unique_review",
             )
         ]
+        ordering = ["-pub_date"]
 
     def __str__(self):
         return self.text[30]
@@ -39,6 +40,9 @@ class Comment(models.Model):
     )
     text = models.TextField("Текст")
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
+
+    class Meta:
+        ordering = ["-pub_date"]
 
     def __str__(self):
         return self.text[30]

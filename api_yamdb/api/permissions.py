@@ -5,6 +5,7 @@ class IsStaff(BasePermission):
     """Сотрудник может менять объект"""
 
     def has_permission(self, request, view):
+        """ user.role user moderator admin """
         # Добавить проверку на сотрудника
         return False
 
