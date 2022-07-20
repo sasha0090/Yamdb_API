@@ -7,10 +7,10 @@ User = get_user_model()
 
 class Review(models.Model):
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name="review"
+        Title, on_delete=models.CASCADE, related_name="reviews"
     )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="review"
+        User, on_delete=models.CASCADE, related_name="reviews"
     )
     text = models.TextField("Текст")
     score = models.IntegerField(
@@ -33,10 +33,10 @@ class Review(models.Model):
 
 class Comment(models.Model):
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name="comment"
+        Review, on_delete=models.CASCADE, related_name="comments"
     )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="comment"
+        User, on_delete=models.CASCADE, related_name="comments"
     )
     text = models.TextField("Текст")
     pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)

@@ -1,17 +1,25 @@
 from django.db import IntegrityError
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 
 from . import serializers
 from .pagination import ReviewCommentPagination
-from .permissions import IsAuthorOrReadOnly, IsStaff
+from .permissions import IsAuthorOrStaffOrReadOnly
 from review.models import Title
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = (
+        Title.objects.all()
+        .annotate(rating=Avg("reviews__score"))
+    )
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ReviewSerializer
-    permission_classes = [IsAuthorOrReadOnly | IsStaff]
+    permission_classes = [IsAuthorOrStaffOrReadOnly]
     pagination_class = ReviewCommentPagination
 
     def get_queryset(self):
@@ -24,12 +32,17 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
 
         title_data = {"title": title, "author": self.request.user}
-        serializer.save(**title_data)
+        try:
+            serializer.save(**title_data)
+        except IntegrityError:
+            raise ValidationError(
+                "The fields title, following must make a unique set."
+            )
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
-    permission_classes = [IsAuthorOrReadOnly | IsStaff]
+    permission_classes = [IsAuthorOrStaffOrReadOnly]
     pagination_class = ReviewCommentPagination
 
     def get_queryset(self):
@@ -49,9 +62,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         )
 
         title_data = {"review": review, "author": self.request.user}
-        try:
-            serializer.save(**title_data)
-        except IntegrityError:
-            raise ValidationError(
-                "The fields title, following must make a unique set."
-            )
+        serializer.save(**title_data)
