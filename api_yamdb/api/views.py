@@ -11,7 +11,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from . import serializers
 from .pagination import ReviewCommentPagination
 from .permissions import (IsAuthorOrStaffOrReadOnly, IsAdminOrStaffPermission,
-                          IsUserForSelfPermission)
+                          IsUserForSelfPermission,)
 from .serializers import (AuthSignUpSerializer, AuthTokenSerializer,
                           CustomUserSerializer)
 
@@ -79,7 +79,9 @@ class CommentViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
-    permission_classes = (IsAdminOrStaffPermission,)
+    permission_classes = (IsAdminOrStaffPermission,
+                          AuthSignUpSerializer,
+                          AuthTokenSerializer)
     search_fields = ("=username",)
     lookup_field = "username"
 

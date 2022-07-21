@@ -1,9 +1,9 @@
 from django.db import models
 
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import UserManager, AbstractUser
 
 
-class User(AbstractBaseUser):
+class User(AbstractUser):
     USER_ROLE_USER = "user"
     USER_ROLE_MODERATOR = "moderator"
     USER_ROLE_ADMIN = "admin"
@@ -37,6 +37,8 @@ class User(AbstractBaseUser):
     def __str__(self):
         """Строковое представление модели (отображается в консоли)"""
         return self.email
+
+    objects = UserManager()
 
     class Meta:
         verbose_name = "Пользователь"
