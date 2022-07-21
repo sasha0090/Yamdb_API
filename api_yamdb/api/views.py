@@ -17,7 +17,7 @@ from .serializers import (AuthSignUpSerializer, AuthTokenSerializer,
 
 from .utils import generate_and_send_confirmation_code_to_email
 
-from review.models import Title
+from reviews.models import Title
 from users.models import User
 
 
@@ -36,7 +36,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Достаем отзывы произведения"""
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
-        return title.review.all()
+        return title.reviews.all()
 
     def perform_create(self, serializer):
         """Добавляем отзыв к произведению и назначаем автора"""
@@ -61,15 +61,15 @@ class CommentViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
 
         review = get_object_or_404(
-            title.review, pk=self.kwargs.get("review_id")
+            title.reviews, pk=self.kwargs.get("review_id")
         )
-        return review.comment.all()
+        return review.comments.all()
 
     def perform_create(self, serializer):
         """Добавляем комментарий к отзыву произведения"""
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
         review = get_object_or_404(
-            title.review, pk=self.kwargs.get("review_id")
+            title.reviews, pk=self.kwargs.get("review_id")
         )
 
         title_data = {"review": review, "author": self.request.user}
