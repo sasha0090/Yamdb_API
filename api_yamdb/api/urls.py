@@ -17,6 +17,12 @@ router.register(
     basename="comments",
 )
 router.register(r"users", views.UserViewSet, basename="users")
+router.register(
+    r'titles', views.TitleViewSet, basename='title')
+router.register(
+    r'categories', views.CategoryViewSet, basename='category')
+router.register(
+    r'genres', views.GenreViewSet, basename='genre')
 
 urlpatterns = [
     path("v1/", include(router.urls)),

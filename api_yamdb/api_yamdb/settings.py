@@ -17,17 +17,17 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "users.apps.UsersConfig",
+    "django.contrib.admin",
     "rest_framework",
     "rest_framework.authtoken",
     "api.apps.ApiConfig",
-    "users.apps.UsersConfig",
-    'review.apps.ReviewConfig'
+    "reviews.apps.ReviewsConfig"
 ]
 
 AUTH_USER_MODEL = "users.User"
@@ -111,7 +111,7 @@ STATIC_URL = "/static/"
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
 
-EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_ADMIN = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 
 

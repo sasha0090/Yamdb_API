@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from review.models import Comment, Review
+from reviews.models import Comment, Review, Category, Genre, Title
 from users.models import User
 
 
@@ -27,8 +27,8 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ("id", "text", "author", "pub_date")
 
-        
-class CustomUserSerializer(serializers.UserSerializer):
+
+class CustomUserSerializer(serializers.ModelSerializer):
     """Класс для переопределения нового эндпоинта"""
 
     class Meta:
@@ -56,3 +56,24 @@ class AuthSignUpSerializer(serializers.ModelSerializer):
 class AuthTokenSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
     confirmation_code = serializers.CharField(max_length=50)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('name', 'slug',)
+        model = Category
+
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('name', 'slug',)
+        model = Genre
+
+
+class TitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', )
+        model = Title

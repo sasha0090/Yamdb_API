@@ -13,11 +13,11 @@ from .pagination import ReviewCommentPagination
 from .permissions import (IsAuthorOrStaffOrReadOnly, IsAdminOrStaffPermission,
                           IsUserForSelfPermission)
 from .serializers import (AuthSignUpSerializer, AuthTokenSerializer,
-                          UserSerializer)
+                          CustomUserSerializer)
 
 from .utils import generate_and_send_confirmation_code_to_email
 
-from review.models import Title
+from reviews.models import Title, Category, Genre
 from users.models import User
 
 
@@ -36,7 +36,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Достаем отзывы произведения"""
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
-        return title.review.all()
+        return title.reviews.all()
 
     def perform_create(self, serializer):
         """Добавляем отзыв к произведению и назначаем автора"""
@@ -61,15 +61,15 @@ class CommentViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
 
         review = get_object_or_404(
-            title.review, pk=self.kwargs.get("review_id")
+            title.reviews, pk=self.kwargs.get("review_id")
         )
-        return review.comment.all()
+        return review.comments.all()
 
     def perform_create(self, serializer):
         """Добавляем комментарий к отзыву произведения"""
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
         review = get_object_or_404(
-            title.review, pk=self.kwargs.get("review_id")
+            title.reviews, pk=self.kwargs.get("review_id")
         )
 
         title_data = {"review": review, "author": self.request.user}
@@ -78,7 +78,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = CustomUserSerializer
     permission_classes = (IsAdminOrStaffPermission,)
     search_fields = ("=username",)
     lookup_field = "username"
@@ -90,15 +90,30 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def me(self, request):
         if request.method == "PATCH":
-            serializer = UserSerializer(request.user,
-                                        data=request.data,
-                                        partial=True
-                                        )
+            serializer = CustomUserSerializer(request.user,
+                                              data=request.data,
+                                              partial=True
+                                              )
             serializer.is_valid(raise_exception=True)
             serializer.save(role=request.user.role)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = UserSerializer(request.user)
+        serializer = CustomUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = serializers.CategorySerializer
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = serializers.GenreSerializer
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = serializers.TitleSerializer
 
 
 @api_view(["POST"])
