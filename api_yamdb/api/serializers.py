@@ -1,0 +1,58 @@
+from rest_framework import serializers
+
+from reviews.models import Comment, Review
+from users.models import User
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field="username",
+        default=serializers.CurrentUserDefault(),
+    )
+
+    class Meta:
+        model = Review
+        fields = ("id", "text", "author", "score", "pub_date")
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field="username",
+        default=serializers.CurrentUserDefault(),
+    )
+
+    class Meta:
+        model = Comment
+        fields = ("id", "text", "author", "pub_date")
+
+        
+class CustomUserSerializer(serializers.UserSerializer):
+    """Класс для переопределения нового эндпоинта"""
+
+    class Meta:
+        model = User
+        fields = ("username",
+                  "email",
+                  "first_name",
+                  "last_name",
+                  "bio",
+                  "role"
+                  )
+
+    def validate(self, data):
+        if data.get("username") == "me":
+            raise serializers.ValidationError("Username указан неверно!")
+        return data
+
+
+class AuthSignUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("email", "username")
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    confirmation_code = serializers.CharField(max_length=50)
