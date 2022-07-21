@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "api.apps.ApiConfig",
     "users.apps.UsersConfig",
-
+    'review.apps.ReviewConfig'
 ]
 
 AUTH_USER_MODEL = "users.User"
