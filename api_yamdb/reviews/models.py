@@ -31,11 +31,15 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=200)
-    year = models.DateField(null=True, blank=True)
+    year = models.IntegerField(null=True, blank=True)
     description = models.TextField()
     genre = models.ForeignKey(
-        Genre, on_delete=models.SET_NULL, related_name='genre')
+        Genre, null=True,
+        on_delete=models.SET_NULL, related_name='genre')
     category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, related_name='category')
-#    review = models.ForeignKey(
+        Category, null=True,
+        on_delete=models.SET_NULL, related_name='category')
+#    rating = models.ForeignKey(
 #        Review, on_delete=models.CASCADE, related_name='review')
+#    rating = models.IntegerField(
+#        "Оценка", validators=[MinValueValidator(1), MaxValueValidator(10)]

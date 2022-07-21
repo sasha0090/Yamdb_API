@@ -9,11 +9,11 @@ app_name = 'reviews'
 router_v1 = SimpleRouter()
 
 router_v1.register(
-    r'v1/titles/(?P<id>', views.CategoryViewSet, basename='title')
+    r'v1/titles', views.TitleViewSet, basename='title')
 router_v1.register(
-    r'v1/categories/(?P<id>', views.GenreViewSet, basename='category')
+    r'v1/categories', views.CategoryViewSet, basename='category')
 router_v1.register(
-    r'v1/genres/(?P<id>', views.TitleViewSet, basename='genre')
+    r'v1/genres', views.GenreViewSet, basename='genre')
 
 urlpatterns = [
     path('', include(router_v1.urls)),
