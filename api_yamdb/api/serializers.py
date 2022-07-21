@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from review.models import Comment, Review
+from reviews.models import Comment, Review
 from users.models import User
 
 
