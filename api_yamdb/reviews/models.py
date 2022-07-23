@@ -1,22 +1,20 @@
-from django.db import models
-from django.core.validators import validate_slug
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    validate_slug)
 from django.db import models
 
-from users.models import User
+User = get_user_model()
 
 
 class Category(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(
-        unique=True,
-        max_length=50,
-        validators=[validate_slug])
+        unique=True, max_length=50, validators=[validate_slug]
+    )
 
     class Meta:
-        verbose_name = 'Категория'
-        ordering = ('-name',)
+        verbose_name = "Категория"
+        ordering = ("-name",)
 
     def __str__(self):
         return self.name
@@ -27,8 +25,8 @@ class Genre(models.Model):
     slug = models.SlugField(unique=True)
 
     class Meta:
-        verbose_name = 'Жанр'
-        ordering = ('-name',)
+        verbose_name = "Жанр"
+        ordering = ("-name",)
 
     def __str__(self):
         return self.name
@@ -39,13 +37,11 @@ class Title(models.Model):
     year = models.IntegerField(null=True, blank=True)
     description = models.TextField()
     genre = models.ForeignKey(
-        Genre, null=True,
-        on_delete=models.SET_NULL, related_name='genre')
+        Genre, null=True, on_delete=models.SET_NULL, related_name="genre"
+    )
     category = models.ForeignKey(
-        Category, null=True,
-        on_delete=models.SET_NULL, related_name='category')
-#    review = models.ForeignKey(
-#        Review, on_delete=models.CASCADE, related_name='review')
+        Category, null=True, on_delete=models.SET_NULL, related_name="category"
+    )
 
 
 class Review(models.Model):

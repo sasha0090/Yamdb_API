@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
@@ -67,6 +68,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
 
         title_data = {"title": title, "author": self.request.user}
+
         try:
             serializer.save(**title_data)
         except IntegrityError:
