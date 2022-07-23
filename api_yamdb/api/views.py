@@ -17,7 +17,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from . import serializers
 from .pagination import ReviewCommentPagination
-from .permissions import (IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly)
+from .permissions import (IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly, IsAdmin)
 from .serializers import (UserSerializer, UserEmailSerializer,
                           TokenSerializer, AdminSerializer,
                           TitleSerializer)
@@ -137,7 +137,9 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = AdminSerializer
     lookup_field = "username"
-    permission_classes = [IsAdminOrReadonly, ]
+    permission_classes = [
+        IsAdmin,
+    ]
     filter_backends = [filters.SearchFilter]
     search_fields = ("username",)
     pagination_class = LimitOffsetPagination
