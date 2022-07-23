@@ -1,6 +1,5 @@
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
-
-from django.contrib.auth.models import UserManager, AbstractUser
 
 
 class User(AbstractUser):
@@ -19,7 +18,7 @@ class User(AbstractUser):
         db_index=True,
         unique=True,
         max_length=255,
-        verbose_name="Электронная почта"
+        verbose_name="Электронная почта",
     )
     role = models.CharField(
         max_length=16,

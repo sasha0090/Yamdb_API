@@ -1,7 +1,9 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from reviews.models import Comment, Review, Category, Genre, Title
-from users.models import User
+from reviews.models import Category, Comment, Genre, Review, Title
+
+User = get_user_model()
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -33,13 +35,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("username",
-                  "email",
-                  "first_name",
-                  "last_name",
-                  "bio",
-                  "role"
-                  )
+        fields = (
+            "username", "email", "first_name", "last_name", "bio", "role"
+        )
 
     def validate(self, data):
         if data.get("username") == "me":
@@ -65,21 +63,24 @@ class AuthTokenSerializer(serializers.Serializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
     class Meta:
-        fields = ('name', 'slug',)
+        fields = ("name", "slug")
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
-
     class Meta:
-        fields = ('name', 'slug',)
+        fields = ("name", "slug")
         model = Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    category = serializers.PrimaryKeyRelatedField(read_only=True)
+    genre = serializers.PrimaryKeyRelatedField(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', )
+        fields = (
+            "id", "name", "year", "rating", "description", "genre", "category"
+        )
         model = Title
