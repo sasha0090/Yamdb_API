@@ -7,15 +7,11 @@ from rest_framework import serializers
 
 from reviews.models import Category, Comment, Genre, Review, Title
 
+from api_yamdb.settings import (
+    MESSAGE_FOR_RESERVED_NAME, MESSAGE_FOR_USER_NOT_FOUND, RESERVED_NAME,
+)
+
 User = get_user_model()
-
-from api_yamdb.settings import (
-    MESSAGE_FOR_RESERVED_NAME, MESSAGE_FOR_USER_NOT_FOUND, RESERVED_NAME,
-)
-
-from api_yamdb.settings import (
-    MESSAGE_FOR_RESERVED_NAME, MESSAGE_FOR_USER_NOT_FOUND, RESERVED_NAME,
-)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

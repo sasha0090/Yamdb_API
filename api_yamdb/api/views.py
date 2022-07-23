@@ -17,7 +17,8 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from . import serializers
 from .pagination import ReviewCommentPagination
-from .permissions import (IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly, IsAdmin)
+from .permissions import (IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly,
+                          IsAdmin)
 from .serializers import (UserSerializer, UserEmailSerializer,
                           TokenSerializer, AdminSerializer,
                           TitleSerializer)
@@ -27,6 +28,7 @@ from api_yamdb import settings
 from reviews.models import Title, Category, Genre
 
 User = get_user_model()
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = (
