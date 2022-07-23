@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-User = get_user_model()
+from users.models import User
 
 
 class Category(models.Model):
@@ -36,14 +36,15 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=200)
-    year = models.DateField(null=True, blank=True)
-    description = models.TextField()
-    genre = models.ForeignKey(
-        Genre, on_delete=models.SET_NULL, related_name='genre')
+    year = models.IntegerField(null=True, blank=True)
+    description = models.TextField(null=True,)
+    genre = models.ManyToManyField(Genre, related_name='genres', blank=True)
     category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, related_name='category')
-#    review = models.ForeignKey(
-#        Review, on_delete=models.CASCADE, related_name='review')
+        Category, null=True,
+        on_delete=models.SET_NULL, related_name='category')
+
+    def __str__(self):
+        return self.name
 
 
 class Review(models.Model):
