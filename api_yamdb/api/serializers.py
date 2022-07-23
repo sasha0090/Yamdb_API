@@ -1,9 +1,13 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.validators import UniqueValidator
+from rest_framework import serializers
 
-from reviews.models import Comment, Review, Category, Genre, Title
-from users.models import User
+from reviews.models import Category, Comment, Genre, Review, Title
+
+User = get_user_model()
 
 from api_yamdb.settings import (
     MESSAGE_FOR_RESERVED_NAME, MESSAGE_FOR_USER_NOT_FOUND, RESERVED_NAME,
@@ -112,21 +116,24 @@ class AdminSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
     class Meta:
-        fields = ('name', 'slug',)
+        fields = ("name", "slug")
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
-
     class Meta:
-        fields = ('name', 'slug',)
+        fields = ("name", "slug")
         model = Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    category = serializers.PrimaryKeyRelatedField(read_only=True)
+    genre = serializers.PrimaryKeyRelatedField(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', )
+        fields = (
+            "id", "name", "year", "rating", "description", "genre", "category"
+        )
         model = Title
