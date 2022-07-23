@@ -22,12 +22,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "users.apps.UsersConfig",
     "django.contrib.admin",
     "rest_framework",
-    "rest_framework.authtoken",
+    "django_filters",
+    "rest_framework_simplejwt",
     "api.apps.ApiConfig",
-    "reviews.apps.ReviewsConfig"
+    "reviews.apps.ReviewsConfig",
+    "users.apps.UsersConfig",
 ]
 
 AUTH_USER_MODEL = "users.User"
@@ -113,18 +114,27 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
 
 EMAIL_ADMIN = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+DEFAULT_FROM_EMAIL = "webmaster@localhost"
 
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.AllowAny",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 5,
 }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+RESERVED_NAME = "me"
+MESSAGE_FOR_RESERVED_NAME = '"me" can not use'
+MESSAGE_FOR_USER_NOT_FOUND = "user is nothing"
+SEND_FROM_EMAIL = "api@yamdb.ru"
+PAGINATOR_PAGE_ITEMS_COUNT = 10
