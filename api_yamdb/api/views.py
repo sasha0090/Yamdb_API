@@ -7,11 +7,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.decorators import action, api_view
 from rest_framework import viewsets, status, filters, mixins
-from rest_framework.pagination import (LimitOffsetPagination,
-                                       PageNumberPagination)
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
@@ -21,7 +19,8 @@ from .pagination import ReviewCommentPagination
 from .permissions import (CommentPermission, IsAdmin,
                           IsAdminOrReadonly, ReviewPermission)
 from .serializers import (UserSerializer, UserEmailSerializer,
-                          TokenSerializer, AdminSerializer)
+                          TokenSerializer, AdminSerializer,
+                          TitleSerializer)
 
 
 from api_yamdb import settings
@@ -34,16 +33,23 @@ class TitleViewSet(viewsets.ModelViewSet):
         Title.objects.all()
         .annotate(rating=Avg("reviews__score"))
     )
+    serializer_class = TitleSerializer
+    filter_backends = [DjangoFilterBackend]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
+    permission_classes = [IsAdminOrReadonly, ]
 
 
 class GenreViewSet(viewsets.ModelViewSet):
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
+    permission_classes = [IsAdminOrReadonly, ]
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
