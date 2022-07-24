@@ -13,7 +13,7 @@ class TitleFilter(filters.FilterSet):
         lookup_expr='icontains'
     )
     name = filters.CharFilter(
-        field_name='name__slug',
+        field_name='name',
         lookup_expr='icontains'
     )
     year = filters.NumberFilter(
