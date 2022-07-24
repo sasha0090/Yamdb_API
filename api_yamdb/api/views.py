@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
@@ -16,19 +17,22 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from . import serializers
 from .pagination import ReviewCommentPagination
-from .permissions import (CommentPermission, IsAdmin,
-                          IsAdminOrReadonly, ReviewPermission)
+from .permissions import (IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly, IsAdmin)
 from .serializers import (UserSerializer, UserEmailSerializer,
                           TokenSerializer, AdminSerializer,
+<<<<<<< HEAD
                           ReadTitleSerializer, WriteTitleSerializer)
 from . import filtres
 from . import mixins
+=======
+                          TitleSerializer)
+>>>>>>> b4e088170414729cd83148a929376afab486fc1c
 
 
 from api_yamdb import settings
 from reviews.models import Title, Category, Genre
-from users.models import User
 
+User = get_user_model()
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = (
@@ -36,6 +40,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         .annotate(rating=Avg("reviews__score"))
     )
     filter_backends = [DjangoFilterBackend]
+<<<<<<< HEAD
     permission_classes = [IsAdminOrReadonly, ]
     filter_backends = (DjangoFilterBackend, )
     filterset_class = filtres.TitleFilter
@@ -50,26 +55,25 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(mixins.CreateDestroyViewSet):
+=======
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+>>>>>>> b4e088170414729cd83148a929376afab486fc1c
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
     permission_classes = [IsAdminOrReadonly, ]
-    filter_backends = [filters.SearchFilter]
-    search_fields = ('name', 'slug')
-    lookup_field = 'slug'
 
 
 class GenreViewSet(mixins.CreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
     permission_classes = [IsAdminOrReadonly, ]
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', )
-    lookup_field = 'slug'
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ReviewSerializer
-    permission_classes = [ReviewPermission]
+    permission_classes = [IsAuthorOrStaffOrReadOnly]
     pagination_class = ReviewCommentPagination
 
     def get_queryset(self):
@@ -82,6 +86,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
 
         title_data = {"title": title, "author": self.request.user}
+
         try:
             serializer.save(**title_data)
         except IntegrityError:
@@ -124,7 +129,7 @@ def token(request):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
-    permission_classes = [CommentPermission]
+    permission_classes = [IsAuthorOrStaffOrReadOnly, ]
     pagination_class = ReviewCommentPagination
 
     def get_queryset(self):
