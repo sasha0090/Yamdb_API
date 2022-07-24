@@ -16,13 +16,11 @@ router.register(
     views.CommentViewSet,
     basename='comments',
 )
-router.register(r'users', views.UserViewSet, basename='users')
-router.register(
-    r'titles', views.TitleViewSet, basename='title')
-router.register(
-    r'categories', views.CategoryViewSet, basename='category')
-router.register(
-    r'genres', views.GenreViewSet, basename='genre')
+
+router.register("users", views.UserViewSet, basename="users")
+router.register("titles", views.TitleViewSet, basename="title")
+router.register("categories", views.CategoryViewSet, basename="category")
+router.register("genres", views.GenreViewSet, basename="genre")
 
 urlpatterns = [
     path('v1/', include(router.urls)),
