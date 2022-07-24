@@ -1,7 +1,5 @@
 from rest_framework import permissions
 
-USER_METODS = ("GET", "HEAD", "OPTIONS", "POST", "PATCH")
-
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):

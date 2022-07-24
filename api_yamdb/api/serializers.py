@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.validators import UniqueValidator
-from rest_framework import serializers
 
 from reviews.models import Category, Comment, Genre, Review, Title
 
@@ -121,6 +120,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('name', 'slug',)
         model = Category
         lookup_field = 'slug'
+        ordering = ("-name",)
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -131,11 +131,25 @@ class GenreSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
-class TitleSerializer(serializers.ModelSerializer):
+class ReadTitleSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = "__all__"
+        model = Title
+
+
+class WriteTitleSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug')
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True)
+
+    class Meta:
+        fields = '__all__'
         model = Title
