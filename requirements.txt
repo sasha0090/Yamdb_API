@@ -8,7 +8,7 @@ colorama==0.4.4
 coverage==6.3.2
 Django==2.2.16
 django-debug-toolbar==2.2
-django-filter==22.1
+django-filter
 djangorestframework==3.13.1
 djangorestframework_simplejwt
 Faker==12.0.1
