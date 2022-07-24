@@ -14,19 +14,16 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.filters import SearchFilter
 
 from . import serializers
 from .pagination import ReviewCommentPagination
 from .permissions import (IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly, IsAdmin)
 from .serializers import (UserSerializer, UserEmailSerializer,
                           TokenSerializer, AdminSerializer,
-<<<<<<< HEAD
                           ReadTitleSerializer, WriteTitleSerializer)
 from . import filtres
 from . import mixins
-=======
-                          TitleSerializer)
->>>>>>> b4e088170414729cd83148a929376afab486fc1c
 
 
 from api_yamdb import settings
@@ -40,7 +37,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         .annotate(rating=Avg("reviews__score"))
     )
     filter_backends = [DjangoFilterBackend]
-<<<<<<< HEAD
     permission_classes = [IsAdminOrReadonly, ]
     filter_backends = (DjangoFilterBackend, )
     filterset_class = filtres.TitleFilter
@@ -55,20 +51,21 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(mixins.CreateDestroyViewSet):
-=======
-
-
-class CategoryViewSet(viewsets.ModelViewSet):
->>>>>>> b4e088170414729cd83148a929376afab486fc1c
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
     permission_classes = [IsAdminOrReadonly, ]
+    filter_backends = (SearchFilter, )
+    search_fields = ('name', )
+    lookup_field = 'slug'
 
 
 class GenreViewSet(mixins.CreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
     permission_classes = [IsAdminOrReadonly, ]
+    filter_backends = (SearchFilter, )
+    search_fields = ('name', )
+    lookup_field = 'slug'
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
