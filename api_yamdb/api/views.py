@@ -20,8 +20,9 @@ from .permissions import (CommentPermission, IsAdmin,
                           IsAdminOrReadonly, ReviewPermission)
 from .serializers import (UserSerializer, UserEmailSerializer,
                           TokenSerializer, AdminSerializer,
-                          TitleSerializer)
+                          ReadTitleSerializer, WriteTitleSerializer)
 from . import filtres
+from . import mixins
 
 
 from api_yamdb import settings
@@ -34,19 +35,21 @@ class TitleViewSet(viewsets.ModelViewSet):
         Title.objects.all()
         .annotate(rating=Avg("reviews__score"))
     )
-    serializer_class = TitleSerializer
     filter_backends = [DjangoFilterBackend]
     permission_classes = [IsAdminOrReadonly, ]
     filter_backends = (DjangoFilterBackend, )
     filterset_class = filtres.TitleFilter
+    lookup_field = ('id' or 'name')
+    pagination_class = ReviewCommentPagination
+
+    def get_serializer_class(self):
+        # Костыли, но вроде работает
+        if self.action in ('list', 'retrieve'):
+            return ReadTitleSerializer
+        return WriteTitleSerializer
 
 
-
-class CategoryViewSet(viewsets.ModelViewSet):
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
+class CategoryViewSet(mixins.CreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
     permission_classes = [IsAdminOrReadonly, ]
@@ -55,10 +58,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
+class GenreViewSet(mixins.CreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
     permission_classes = [IsAdminOrReadonly, ]
