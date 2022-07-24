@@ -22,9 +22,11 @@ class IsAuthorOrStaffOrReadOnly(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         user = request.user
-        return (is_safe_methods(request.method)
-                or user.is_authenticated
-                and (obj.author == user or user.is_moderator or user.is_admin))
+        return (
+            is_safe_methods(request.method)
+            or user.is_authenticated
+            and (obj.author == user or user.is_moderator or user.is_admin)
+        )
 
 
 class IsAdminOrReadonly(permissions.BasePermission):

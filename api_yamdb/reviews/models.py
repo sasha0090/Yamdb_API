@@ -35,18 +35,20 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(max_length=200)
     year = models.IntegerField(null=True, blank=True)
-    description = models.TextField(null=True,)
-    genre = models.ManyToManyField(Genre, related_name='titles', blank=True)
+    description = models.TextField(
+        null=True,
+    )
+    genre = models.ManyToManyField(Genre, related_name="titles", blank=True)
     category = models.ForeignKey(
-        Category, null=True,
-        on_delete=models.SET_NULL, related_name='category')
+        Category, null=True, on_delete=models.SET_NULL, related_name="category"
+    )
 
     def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = 'Произведение'
-        ordering = ('-name',)
+        verbose_name = "Произведение"
+        ordering = ("-name",)
 
 
 class Review(models.Model):

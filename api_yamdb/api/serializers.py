@@ -1,14 +1,12 @@
 from django.contrib.auth import get_user_model
-
-from rest_framework import serializers, exceptions
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework import exceptions, serializers
 from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from api_yamdb.settings import (MESSAGE_FOR_RESERVED_NAME,
+                                MESSAGE_FOR_USER_NOT_FOUND, RESERVED_NAME)
 
 from reviews.models import Category, Comment, Genre, Review, Title
-
-from api_yamdb.settings import (
-    MESSAGE_FOR_RESERVED_NAME, MESSAGE_FOR_USER_NOT_FOUND, RESERVED_NAME,
-)
 
 User = get_user_model()
 
@@ -115,20 +113,24 @@ class AdminSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
     class Meta:
-        fields = ('name', 'slug',)
+        fields = (
+            "name",
+            "slug",
+        )
         model = Category
-        lookup_field = 'slug'
+        lookup_field = "slug"
         ordering = ("-name",)
 
 
 class GenreSerializer(serializers.ModelSerializer):
-
     class Meta:
-        fields = ('name', 'slug',)
+        fields = (
+            "name",
+            "slug",
+        )
         model = Genre
-        lookup_field = 'slug'
+        lookup_field = "slug"
 
 
 class ReadTitleSerializer(serializers.ModelSerializer):
@@ -143,13 +145,12 @@ class ReadTitleSerializer(serializers.ModelSerializer):
 
 class WriteTitleSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
-        queryset=Category.objects.all(),
-        slug_field='slug')
+        queryset=Category.objects.all(), slug_field="slug"
+    )
     genre = serializers.SlugRelatedField(
-        queryset=Genre.objects.all(),
-        slug_field='slug',
-        many=True)
+        queryset=Genre.objects.all(), slug_field="slug", many=True
+    )
 
     class Meta:
-        fields = '__all__'
+        fields = "__all__"
         model = Title

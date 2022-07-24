@@ -1,12 +1,7 @@
 import pytest
 
-from .common import (
-    auth_client,
-    create_categories,
-    create_genre,
-    create_titles,
-    create_users_api,
-)
+from .common import (auth_client, create_categories, create_genre,
+                     create_titles, create_users_api)
 
 
 class Test04TitleAPI:
@@ -136,12 +131,16 @@ class Test04TitleAPI:
             "description": "Крутое пике",
         }
         admin_client.post("/api/v1/titles/", data=data)
-        response = admin_client.get(f'/api/v1/titles/?genre={genres[1]["slug"]}')
+        response = admin_client.get(
+            f'/api/v1/titles/?genre={genres[1]["slug"]}'
+        )
         data = response.json()
         assert (
             len(data["results"]) == 2
         ), "Проверьте, что при GET запросе `/api/v1/titles/` фильтуется по `genre` параметру `slug` жанра"
-        response = admin_client.get(f'/api/v1/titles/?category={categories[0]["slug"]}')
+        response = admin_client.get(
+            f'/api/v1/titles/?category={categories[0]["slug"]}'
+        )
         data = response.json()
         assert (
             len(data["results"]) == 1
@@ -195,7 +194,9 @@ class Test04TitleAPI:
             "Значение `name` неправильное."
         )
         data = {"name": "Новое название", "category": categories[1]["slug"]}
-        response = admin_client.patch(f'/api/v1/titles/{titles[0]["id"]}/', data=data)
+        response = admin_client.patch(
+            f'/api/v1/titles/{titles[0]["id"]}/', data=data
+        )
         assert (
             response.status_code == 200
         ), "Проверьте, что при PATCH запросе `/api/v1/titles/{title_id}/` возвращается статус 200"
@@ -241,7 +242,9 @@ class Test04TitleAPI:
             f"Проверьте, что при POST запросе `/api/v1/titles/` "
             f"с токеном авторизации {user_name} возвращается статус 403"
         )
-        response = client_user.patch(f'/api/v1/titles/{titles[0]["id"]}/', data=data)
+        response = client_user.patch(
+            f'/api/v1/titles/{titles[0]["id"]}/', data=data
+        )
         assert response.status_code == 403, (
             f"Проверьте, что при PATCH запросе `/api/v1/titles/{{title_id}}/` "
             f"с токеном авторизации {user_name} возвращается статус 403"
@@ -267,7 +270,9 @@ class Test04TitleAPI:
             "Проверьте, что при POST запросе `/api/v1/titles/` "
             "без токена авторизации возвращается статус 401"
         )
-        response = client.patch(f'/api/v1/titles/{titles[0]["id"]}/', data=data)
+        response = client.patch(
+            f'/api/v1/titles/{titles[0]["id"]}/', data=data
+        )
         assert response.status_code == 401, (
             "Проверьте, что при PATCH запросе `/api/v1/titles/{{title_id}}/` "
             "без токена авторизации возвращается статус 401"
@@ -281,4 +286,6 @@ class Test04TitleAPI:
         self.check_permissions(
             user, "обычного пользователя", titles, categories, genres
         )
-        self.check_permissions(moderator, "модератора", titles, categories, genres)
+        self.check_permissions(
+            moderator, "модератора", titles, categories, genres
+        )

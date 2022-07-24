@@ -1,72 +1,67 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
 from django_filters.rest_framework import DjangoFilterBackend
-
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action, api_view
-from rest_framework import viewsets, status, filters, mixins
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.exceptions import ValidationError
+from rest_framework.filters import SearchFilter
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.filters import SearchFilter
-
-from . import serializers
-from .pagination import ReviewCommentPagination
-from .permissions import (IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly,
-                          IsAdmin)
-from .serializers import (UserSerializer, UserEmailSerializer,
-                          TokenSerializer, AdminSerializer,
-                          ReadTitleSerializer, WriteTitleSerializer)
-from . import filtres
-from . import mixins
-
 
 from api_yamdb import settings
-from reviews.models import Title, Category, Genre
+
+from . import filtres, mixins, serializers
+from .pagination import ReviewCommentPagination
+from .permissions import IsAdmin, IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly
+from reviews.models import Category, Genre, Title
 
 User = get_user_model()
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = (
-        Title.objects.all()
-        .annotate(rating=Avg("reviews__score"))
-    )
+    queryset = Title.objects.all().annotate(rating=Avg("reviews__score"))
     filter_backends = [DjangoFilterBackend]
-    permission_classes = [IsAdminOrReadonly, ]
-    filter_backends = (DjangoFilterBackend, )
+    permission_classes = [
+        IsAdminOrReadonly,
+    ]
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = filtres.TitleFilter
-    lookup_field = ('id' or 'name')
+    lookup_field = "id" or "name"
     pagination_class = ReviewCommentPagination
 
     def get_serializer_class(self):
         # Костыли, но вроде работает
-        if self.action in ('list', 'retrieve'):
-            return ReadTitleSerializer
-        return WriteTitleSerializer
+        if self.action in ("list", "retrieve"):
+            return serializers.ReadTitleSerializer
+        return serializers.WriteTitleSerializer
 
 
 class CategoryViewSet(mixins.CreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
-    permission_classes = [IsAdminOrReadonly, ]
-    filter_backends = (SearchFilter, )
-    search_fields = ('name', )
-    lookup_field = 'slug'
+    permission_classes = [
+        IsAdminOrReadonly,
+    ]
+    filter_backends = (SearchFilter,)
+    search_fields = ("name",)
+    lookup_field = "slug"
 
 
 class GenreViewSet(mixins.CreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
-    permission_classes = [IsAdminOrReadonly, ]
-    filter_backends = (SearchFilter, )
-    search_fields = ('name', )
-    lookup_field = 'slug'
+    permission_classes = [
+        IsAdminOrReadonly,
+    ]
+    filter_backends = (SearchFilter,)
+    search_fields = ("name",)
+    lookup_field = "slug"
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -92,9 +87,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
             )
 
 
-@api_view(["post"],)
+@api_view(
+    ["post"],
+)
 def signup(request):
-    serializer = UserEmailSerializer(data=request.data)
+    serializer = serializers.UserEmailSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     user = get_object_or_404(User, username=request.data.get("username"))
@@ -112,7 +109,7 @@ def signup(request):
 
 @api_view(["post"])
 def token(request):
-    serializer = TokenSerializer(data=request.data)
+    serializer = serializers.TokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(User, username=request.data.get("username"))
 
@@ -126,7 +123,9 @@ def token(request):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
-    permission_classes = [IsAuthorOrStaffOrReadOnly, ]
+    permission_classes = [
+        IsAuthorOrStaffOrReadOnly,
+    ]
     pagination_class = ReviewCommentPagination
 
     def get_queryset(self):
@@ -151,7 +150,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = AdminSerializer
+    serializer_class = serializers.AdminSerializer
     lookup_field = "username"
     permission_classes = [
         IsAdmin,
@@ -169,9 +168,11 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def me(self, request, *args, **kwargs):
         user = self.request.user
-        serializer = UserSerializer(user)
+        serializer = serializers.UserSerializer(user)
         if self.request.method == "PATCH" and user.role != "user":
-            serializer = UserSerializer(user, data=request.data, partial=True)
+            serializer = serializers.UserSerializer(user,
+                                                    data=request.data,
+                                                    partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
         return Response(serializer.data)
