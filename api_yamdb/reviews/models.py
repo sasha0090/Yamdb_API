@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import (MaxValueValidator, MinValueValidator,
-                                    validate_slug)
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+    validate_slug,
+)
 from django.db import models
 
 User = get_user_model()
@@ -14,7 +17,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = "Категория"
-        ordering = ("-name",)
+        ordering = ["-name"]
 
     def __str__(self):
         return self.name
@@ -26,7 +29,7 @@ class Genre(models.Model):
 
     class Meta:
         verbose_name = "Жанр"
-        ordering = ("-name",)
+        ordering = ["-name"]
 
     def __str__(self):
         return self.name
@@ -35,9 +38,7 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(max_length=200)
     year = models.IntegerField(null=True, blank=True)
-    description = models.TextField(
-        null=True,
-    )
+    description = models.TextField(null=True)
     genre = models.ManyToManyField(Genre, related_name="titles", blank=True)
     category = models.ForeignKey(
         Category, null=True, on_delete=models.SET_NULL, related_name="category"
@@ -48,10 +49,11 @@ class Title(models.Model):
 
     class Meta:
         verbose_name = "Произведение"
-        ordering = ("-name",)
+        ordering = ["-name"]
 
 
 class Review(models.Model):
+    string_length = 30
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, related_name="reviews"
     )
@@ -74,10 +76,11 @@ class Review(models.Model):
         ordering = ["-pub_date"]
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:self.string_length]
 
 
 class Comment(models.Model):
+    string_length = 30
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE, related_name="comments"
     )
@@ -91,4 +94,4 @@ class Comment(models.Model):
         ordering = ["-pub_date"]
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:self.string_length]

@@ -1,11 +1,14 @@
 from django.contrib.auth import get_user_model
 from rest_framework import exceptions, serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from api_yamdb.settings import (MESSAGE_FOR_RESERVED_NAME,
-                                MESSAGE_FOR_USER_NOT_FOUND, RESERVED_NAME)
-
+from api_yamdb.settings import (
+    MESSAGE_FOR_RESERVED_NAME,
+    MESSAGE_FOR_USER_NOT_FOUND,
+    RESERVED_NAME,
+)
 from reviews.models import Category, Comment, Genre, Review, Title
 
 User = get_user_model()
@@ -20,7 +23,20 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ("id", "text", "author", "score", "pub_date")
+        fields = ["id", "text", "author", "score", "pub_date"]
+
+    def validate(self, attrs):
+        """Проверяем существует ли ревью тайтла от пользователя"""
+        request = self.context.get("request")
+        title_id = self.context.get("view").kwargs.get("title_id")
+        review = Review.objects.filter(
+            title_id=title_id, author=request.user
+        ).exists()
+        if review and request.method == "POST":
+            raise ValidationError(
+                "Review with such title " "and author already exists!"
+            )
+        return attrs
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -32,7 +48,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ("id", "text", "author", "pub_date")
+        fields = ["id", "text", "author", "pub_date"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,15 +58,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "bio",
-            "role",
-        )
-        read_only_fields = ("role",)
+        fields = [
+            "username", "email", "first_name", "last_name", "bio", "role",
+        ]
+        read_only_fields = ["role"]
 
     def validate_username(self, value):
         if value == RESERVED_NAME:
@@ -94,14 +105,9 @@ class AdminSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "bio",
-            "role",
-        )
+        fields = [
+            "username",  "email", "first_name", "last_name", "bio", "role"
+        ]
 
     def validate_username(self, value):
         if value == RESERVED_NAME:
@@ -114,21 +120,15 @@ class AdminSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        fields = (
-            "name",
-            "slug",
-        )
+        fields = ["name", "slug"]
         model = Category
         lookup_field = "slug"
-        ordering = ("-name",)
+        ordering = ["-name"]
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = (
-            "name",
-            "slug",
-        )
+        fields = ["name", "slug"]
         model = Genre
         lookup_field = "slug"
 
