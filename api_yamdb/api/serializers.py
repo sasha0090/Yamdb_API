@@ -29,12 +29,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         """Проверяем существует ли ревью тайтла от пользователя"""
         request = self.context.get("request")
         title_id = self.context.get("view").kwargs.get("title_id")
+
         review = Review.objects.filter(
             title_id=title_id, author=request.user
         ).exists()
+
         if review and request.method == "POST":
             raise ValidationError(
-                "Review with such title " "and author already exists!"
+                "Review with such title and author already exists!"
             )
         return attrs
 
