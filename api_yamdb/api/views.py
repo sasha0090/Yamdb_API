@@ -15,7 +15,6 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from api_yamdb import settings
-
 from . import filtres, mixins, serializers
 from .pagination import ReviewCommentPagination
 from .permissions import IsAdmin, IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly
@@ -30,7 +29,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = [
         IsAdminOrReadonly,
     ]
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = [DjangoFilterBackend,]
     filterset_class = filtres.TitleFilter
     lookup_field = "id" or "name"
     pagination_class = ReviewCommentPagination
@@ -48,8 +47,8 @@ class CategoryViewSet(mixins.CreateDestroyViewSet):
     permission_classes = [
         IsAdminOrReadonly,
     ]
-    filter_backends = (SearchFilter,)
-    search_fields = ("name",)
+    filter_backends = [SearchFilter,]
+    search_fields = ["name",]
     lookup_field = "slug"
 
 
@@ -59,8 +58,8 @@ class GenreViewSet(mixins.CreateDestroyViewSet):
     permission_classes = [
         IsAdminOrReadonly,
     ]
-    filter_backends = (SearchFilter,)
-    search_fields = ("name",)
+    filter_backends = [SearchFilter,]
+    search_fields = ["name",]
     lookup_field = "slug"
 
 
@@ -87,9 +86,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
             )
 
 
-@api_view(
-    ["post"],
-)
+@api_view(["post"])
 def signup(request):
     serializer = serializers.UserEmailSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -101,7 +98,7 @@ def signup(request):
     send_mail(
         subject="Confirmation code",
         message=f"{user.confirmation_code}",
-        from_email=settings.DEFAULT_FROM_EMAIL,
+        from_email=settings.SEND_FROM_EMAIL,
         recipient_list=(user.email,),
     )
     return Response(status=status.HTTP_200_OK, data=serializer.data)
@@ -156,7 +153,7 @@ class UserViewSet(viewsets.ModelViewSet):
         IsAdmin,
     ]
     filter_backends = [filters.SearchFilter]
-    search_fields = ("username",)
+    search_fields = ["username",]
     pagination_class = LimitOffsetPagination
 
     @action(
