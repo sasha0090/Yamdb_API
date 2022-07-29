@@ -3,11 +3,13 @@ from django.core.validators import (MaxValueValidator, MinValueValidator,
                                     validate_slug)
 from django.db import models
 
+from reviews import constants
+
 User = get_user_model()
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=256, db_index=True)
     slug = models.SlugField(
         unique=True, max_length=50, validators=[validate_slug]
     )
@@ -17,11 +19,11 @@ class Category(models.Model):
         ordering = ("-name",)
 
     def __str__(self):
-        return self.name
+        return self.name[:constants.CATEGORY_STRING_LENGTH]
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, db_index=True)
     slug = models.SlugField(unique=True)
 
     class Meta:
@@ -29,7 +31,7 @@ class Genre(models.Model):
         ordering = ("-name",)
 
     def __str__(self):
-        return self.name
+        return self.name[:constants.GENRE_STRING_LENGTH]
 
 
 class Title(models.Model):
@@ -44,7 +46,7 @@ class Title(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return self.name[:constants.TITLE_STRING_LENGTH]
 
     class Meta:
         verbose_name = "Произведение"
@@ -74,7 +76,7 @@ class Review(models.Model):
         ordering = ["-pub_date"]
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:constants.TITLE_STRING_LENGTH]
 
 
 class Comment(models.Model):
@@ -91,4 +93,4 @@ class Comment(models.Model):
         ordering = ["-pub_date"]
 
     def __str__(self):
-        return self.text[:30]
+        return self.text[:constants.TITLE_STRING_LENGTH]

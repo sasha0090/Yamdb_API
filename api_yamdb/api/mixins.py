@@ -7,4 +7,4 @@ class CreateDestroyViewSet(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
-    pass
+    """Класс создания-чтения-записи"""
