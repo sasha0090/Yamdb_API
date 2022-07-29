@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import (MaxValueValidator, MinValueValidator,
-                                    validate_slug)
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+    validate_slug,
+)
 from django.db import models
 
 from reviews import constants
@@ -16,7 +19,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = "Категория"
-        ordering = ("-name",)
+        ordering = ["-name"]
 
     def __str__(self):
         return self.name[:constants.CATEGORY_STRING_LENGTH]
@@ -28,7 +31,7 @@ class Genre(models.Model):
 
     class Meta:
         verbose_name = "Жанр"
-        ordering = ("-name",)
+        ordering = ["-name"]
 
     def __str__(self):
         return self.name[:constants.GENRE_STRING_LENGTH]
@@ -37,9 +40,7 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(max_length=200)
     year = models.IntegerField(null=True, blank=True)
-    description = models.TextField(
-        null=True,
-    )
+    description = models.TextField(null=True)
     genre = models.ManyToManyField(Genre, related_name="titles", blank=True)
     category = models.ForeignKey(
         Category, null=True, on_delete=models.SET_NULL, related_name="category"
@@ -50,7 +51,7 @@ class Title(models.Model):
 
     class Meta:
         verbose_name = "Произведение"
-        ordering = ("-name",)
+        ordering = ["-name"]
 
 
 class Review(models.Model):
