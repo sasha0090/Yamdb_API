@@ -87,11 +87,8 @@ class TokenSerializer(TokenObtainPairSerializer):
         return value
 
 
-class AdminSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
-
+class AdminSerializer(UserSerializer):
+    
     class Meta:
         model = User
         fields = (
@@ -102,11 +99,6 @@ class AdminSerializer(serializers.ModelSerializer):
             "bio",
             "role",
         )
-
-    def validate_username(self, value):
-        if value == RESERVED_NAME:
-            raise serializers.ValidationError(MESSAGE_FOR_RESERVED_NAME)
-        return value
 
     def create(self, validated_data):
         return User.objects.create(**validated_data)

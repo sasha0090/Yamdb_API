@@ -79,9 +79,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
             )
 
 
-@api_view(
-    ["post"],
-)
+@api_view(["post"])
 def signup(request):
     serializer = serializers.UserEmailSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -93,7 +91,7 @@ def signup(request):
     send_mail(
         subject="Confirmation code",
         message=f"{user.confirmation_code}",
-        from_email=settings.DEFAULT_FROM_EMAIL,
+        from_email=settings.SEND_FROM_EMAIL,
         recipient_list=(user.email,),
     )
     return Response(status=status.HTTP_200_OK, data=serializer.data)
