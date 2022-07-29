@@ -27,16 +27,13 @@ User = get_user_model()
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg("reviews__score"))
     filter_backends = [DjangoFilterBackend]
-    permission_classes = [
-        IsAdminOrReadonly,
-    ]
-    filter_backends = (DjangoFilterBackend,)
+    permission_classes = [IsAdminOrReadonly,]
+    filter_backends = [DjangoFilterBackend,]
     filterset_class = filtres.TitleFilter
     lookup_field = "id" or "name"
     pagination_class = ReviewCommentPagination
 
     def get_serializer_class(self):
-        # Костыли, но вроде работает
         if self.action in ("list", "retrieve"):
             return serializers.ReadTitleSerializer
         return serializers.WriteTitleSerializer
@@ -45,22 +42,18 @@ class TitleViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(mixins.CreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
-    permission_classes = [
-        IsAdminOrReadonly,
-    ]
-    filter_backends = (SearchFilter,)
-    search_fields = ("name",)
+    permission_classes = [IsAdminOrReadonly,]
+    filter_backends = [SearchFilter,]
+    search_fields = ["name",]
     lookup_field = "slug"
 
 
 class GenreViewSet(mixins.CreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
-    permission_classes = [
-        IsAdminOrReadonly,
-    ]
-    filter_backends = (SearchFilter,)
-    search_fields = ("name",)
+    permission_classes = [IsAdminOrReadonly,]
+    filter_backends = [SearchFilter,]
+    search_fields = ["name",]
     lookup_field = "slug"
 
 
@@ -156,7 +149,7 @@ class UserViewSet(viewsets.ModelViewSet):
         IsAdmin,
     ]
     filter_backends = [filters.SearchFilter]
-    search_fields = ("username",)
+    search_fields = ["username",]
     pagination_class = LimitOffsetPagination
 
     @action(
