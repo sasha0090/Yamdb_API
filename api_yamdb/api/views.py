@@ -12,6 +12,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
+
+from api_yamdb import settings
 from . import filtres, mixins, serializers
 from .pagination import ReviewCommentPagination
 from .permissions import IsAdmin, IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly
@@ -31,7 +33,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = ReviewCommentPagination
 
     def get_serializer_class(self):
-        # Костыли, но вроде работает
         if self.action in ["list", "retrieve"]:
             return serializers.ReadTitleSerializer
         return serializers.WriteTitleSerializer
@@ -50,7 +51,7 @@ class GenreViewSet(mixins.CreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
     permission_classes = [IsAdminOrReadonly]
-    filter_backends = (SearchFilter,)
+    filter_backends = [SearchFilter]
     search_fields = ["name"]
     lookup_field = "slug"
 
@@ -86,10 +87,7 @@ def signup(request):
         subject="Confirmation code",
         message=f"{user.confirmation_code}",
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[
-            user.email,
-        ],
-    )
+        recipient_list=[user.email],)
     return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
