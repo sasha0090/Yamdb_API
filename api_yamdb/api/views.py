@@ -148,7 +148,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.AdminSerializer
     lookup_field = "username"
-    permission_classes = [IsAdmin]
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
     filter_backends = [filters.SearchFilter]
     search_fields = ["username"]
     pagination_class = LimitOffsetPagination
