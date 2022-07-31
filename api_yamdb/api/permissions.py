@@ -3,11 +3,9 @@ from rest_framework import permissions
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return (
-            request.user.is_authenticated
-            and request.user.is_admin
-            or request.user.is_superuser
-        )
+        if request.user.is_anonymous:
+            return request.user.is_authenticated
+        return request.user.is_admin
 
 
 def is_safe_methods(method):
@@ -17,22 +15,14 @@ def is_safe_methods(method):
 class IsAuthorOrStaffOrReadOnly(permissions.BasePermission):
     """Просматривать может любой, а запись только автор или админ с модером"""
 
-    def has_permission(self, request, view):
-        return is_safe_methods(request.method) or request.user.is_authenticated
-
     def has_object_permission(self, request, view, obj):
         user = request.user
         return (
             is_safe_methods(request.method)
-            or user.is_authenticated
-            and (obj.author == user or user.is_moderator or user.is_admin)
+            or obj.author == user or user.is_moderator or user.is_admin
         )
 
 
 class IsAdminOrReadonly(permissions.BasePermission):
     def has_permission(self, request, view):
-        return (is_safe_methods(request.method)
-                or (request.user.is_authenticated
-                    and request.user.is_admin
-                    or request.user.is_superuser
-                    ))
+        return is_safe_methods(request.method) or request.user.is_admin

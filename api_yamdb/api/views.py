@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, status, viewsets, permissions
 from rest_framework.decorators import action, api_view
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
@@ -17,7 +17,6 @@ from api_yamdb import settings
 from . import filtres, mixins, serializers
 from .pagination import ReviewCommentPagination
 from .permissions import IsAdmin, IsAdminOrReadonly, IsAuthorOrStaffOrReadOnly
-from api_yamdb import settings
 from reviews.models import Category, Genre, Title
 
 User = get_user_model()
@@ -26,7 +25,10 @@ User = get_user_model()
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg("reviews__score"))
     filter_backends = [DjangoFilterBackend]
-    permission_classes = [IsAdminOrReadonly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAdminOrReadonly
+    ]
     filter_backends = [DjangoFilterBackend]
     filterset_class = filtres.TitleFilter
     lookup_field = "id" or "name"
@@ -41,7 +43,10 @@ class TitleViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(mixins.CreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
-    permission_classes = [IsAdminOrReadonly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAdminOrReadonly
+    ]
     filter_backends = [SearchFilter]
     search_fields = ["name"]
     lookup_field = "slug"
@@ -50,7 +55,10 @@ class CategoryViewSet(mixins.CreateDestroyViewSet):
 class GenreViewSet(mixins.CreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
-    permission_classes = [IsAdminOrReadonly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAdminOrReadonly
+    ]
     filter_backends = [SearchFilter]
     search_fields = ["name"]
     lookup_field = "slug"
@@ -58,7 +66,10 @@ class GenreViewSet(mixins.CreateDestroyViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ReviewSerializer
-    permission_classes = [IsAuthorOrStaffOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthorOrStaffOrReadOnly
+    ]
     pagination_class = ReviewCommentPagination
 
     def get_queryset(self):
@@ -107,7 +118,10 @@ def token(request):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
-    permission_classes = [IsAuthorOrStaffOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthorOrStaffOrReadOnly
+    ]
     pagination_class = ReviewCommentPagination
 
     def get_queryset(self):
